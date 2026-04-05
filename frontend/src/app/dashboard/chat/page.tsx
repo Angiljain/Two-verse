@@ -74,7 +74,7 @@ export default function ChatPage() {
   const partnerName = typeof user?.partner === 'object' ? (user.partner as any).name : user?.partner;
 
   return (
-    <div className="h-[calc(100vh-80px)] flex flex-col glass-panel rounded-3xl overflow-hidden relative">
+    <div className="flex-1 flex flex-col glass-panel rounded-3xl overflow-hidden relative">
       <div className="p-4 border-b border-white/10 flex items-center bg-black/40 backdrop-blur-md z-10">
         <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center font-bold">
           {partnerName?.charAt(0) || 'P'}
