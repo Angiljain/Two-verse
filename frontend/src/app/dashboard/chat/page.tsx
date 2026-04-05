@@ -15,6 +15,7 @@ interface Message {
   content?: string;
   imageUrl?: string;
   mood: string;
+  seen?: boolean;
   createdAt: string;
 }
 
@@ -23,9 +24,15 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputVal, setInputVal] = useState('');
   const [showEmoji, setShowEmoji] = useState(false);
+  const [partnerTyping, setPartnerTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -52,14 +59,45 @@ export default function ChatPage() {
           if (prev.some(m => m._id === msg._id)) return prev;
           return [...prev, msg];
         });
-        setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+        if (msg.senderId !== user._id) {
+           socket.emit('mark_seen', { coupleId: user.coupleId, receiverId: user._id });
+        }
+        setTimeout(scrollToBottom, 50);
       });
+
+      socket.on('typing', (data: { senderId: string, typing: boolean }) => {
+        if (data.senderId !== user._id) {
+          setPartnerTyping(data.typing);
+          if (data.typing) setTimeout(scrollToBottom, 50);
+        }
+      });
+
+      socket.on('messages_seen', (data) => {
+        if (data.receiverId !== user._id) {
+           setMessages(prev => prev.map(m => (!m.seen ? { ...m, seen: true } : m)));
+        }
+      });
+
+      // Mark unread messages on initial load
+      socket.emit('mark_seen', { coupleId: user.coupleId, receiverId: user._id });
 
       return () => {
         socket.disconnect();
       };
     }
   }, [user]);
+
+  const handleTyping = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputVal(e.target.value);
+    if (!socketRef.current || !user) return;
+
+    socketRef.current.emit('typing', { coupleId: user.coupleId, senderId: user._id, typing: true });
+    
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => {
+      socketRef.current?.emit('typing', { coupleId: user.coupleId, senderId: user._id, typing: false });
+    }, 1500);
+  };
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,18 +166,35 @@ export default function ChatPage() {
                 >
                   <div className={`max-w-[70%] rounded-2xl px-4 py-2 text-sm ${isMine ? 'bg-primary text-white rounded-br-none' : 'glass-panel text-white/90 rounded-bl-none'}`}>
                     {msg.imageUrl && (
-                       <img src={msg.imageUrl} alt="attachment" className="rounded-xl mb-2 max-w-full max-h-48 object-cover" />
+                       <img src={msg.imageUrl} onLoad={scrollToBottom} alt="attachment" className="rounded-xl mb-2 max-w-full max-h-48 object-cover" />
                     )}
                     {msg.content}
-                    <span className="text-[10px] opacity-60 block text-right mt-1">
-                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
+                    <div className="flex items-center justify-end gap-1 mt-1 opacity-60">
+                      <span className="text-[10px] block text-right">
+                        {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      {isMine && (
+                        <span className="text-[10px] tracking-tighter w-3 ml-1 text-white">
+                          {msg.seen ? '✓✓' : '✓'}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               );
             })}
           </AnimatePresence>
         )}
+        
+        <AnimatePresence>
+          {partnerTyping && (
+             <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex justify-start">
+                <div className="glass-panel text-white/70 rounded-2xl rounded-bl-none px-4 py-2 text-xs italic flex gap-1 items-center">
+                   typing<span className="animate-bounce inline-block delay-75">.</span><span className="animate-bounce inline-block delay-100">.</span><span className="animate-bounce inline-block delay-150">.</span>
+                </div>
+             </motion.div>
+          )}
+        </AnimatePresence>
         <div ref={messagesEndRef} />
       </div>
 
@@ -165,7 +220,7 @@ export default function ChatPage() {
         </button>
         <input 
           value={inputVal}
-          onChange={(e) => setInputVal(e.target.value)}
+          onChange={handleTyping}
           placeholder="Message..."
           className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-3 outline-none focus:border-primary/50 transition-colors"
         />

@@ -49,11 +49,31 @@ io.on('connection', (socket) => {
 
   socket.on('join_couple_room', (coupleId) => {
     socket.join(coupleId);
-    console.log(`User joined room: ${coupleId}`);
+    console.log(`User mapped to couple internal room: ${coupleId}`);
   });
 
-  socket.on('send_message', (messageData) => {
-    io.to(messageData.coupleId).emit('receive_message', messageData);
+  socket.on('send_message', (message) => {
+    // broadcast to the couple room
+    io.to(message.coupleId).emit('receive_message', message);
+  });
+
+  socket.on('typing', (data) => {
+    // data should contain { coupleId: string, senderId: string, typing: boolean }
+    socket.to(data.coupleId).emit('typing', data);
+  });
+
+  socket.on('mark_seen', async (data) => {
+    // data should contain { coupleId: string, receiverId: string }
+    try {
+      const Message = (await import('./models/Message.js')).default;
+      await Message.updateMany(
+        { coupleId: data.coupleId, receiverId: data.receiverId, seen: false },
+        { $set: { seen: true } }
+      );
+      io.to(data.coupleId).emit('messages_seen', { receiverId: data.receiverId });
+    } catch (err) {
+      console.error('Error updating seen messages:', err);
+    }
   });
 
   socket.on('disconnect', () => {

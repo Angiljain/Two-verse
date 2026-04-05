@@ -43,7 +43,11 @@ export const sendImageMessage = async (req, res) => {
     return res.status(400).json({ message: 'No image file provided' });
   }
 
-  const url = req.file.path;
+  let url = req.file.path;
+  if (!url.startsWith('http')) {
+    const port = process.env.PORT || 5000;
+    url = `http://localhost:${port}/${url.replace(/\\/g, '/')}`;
+  }
 
   const message = await Message.create({
     senderId: user._id,

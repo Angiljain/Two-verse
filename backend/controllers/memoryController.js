@@ -16,8 +16,11 @@ export const uploadMemory = async (req, res) => {
     return res.status(400).json({ message: 'No image file provided' });
   }
 
-  // Cloudinary URL is returned in req.file.path
-  const url = req.file.path;
+  let url = req.file.path;
+  if (!url.startsWith('http')) {
+    const port = process.env.PORT || 5000;
+    url = `http://localhost:${port}/${url.replace(/\\/g, '/')}`;
+  }
 
   const memory = await Memory.create({
     url,
