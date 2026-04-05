@@ -47,6 +47,21 @@ export const deleteMemory = async (req, res) => {
     return res.status(401).json({ message: 'Not authorized to delete this memory' });
   }
 
+  // Attempt to delete local file if it exists
+  try {
+    if (memory.url.includes('localhost')) {
+      const filename = memory.url.split('/').pop();
+      const fs = await import('fs');
+      const path = await import('path');
+      const filepath = path.join(process.cwd(), 'uploads', filename);
+      if (fs.existsSync(filepath)) {
+        fs.unlinkSync(filepath);
+      }
+    }
+  } catch (e) {
+    console.error('File cleanup failed', e);
+  }
+
   await Memory.findByIdAndDelete(req.params.id);
   res.json({ message: 'Memory removed' });
 };

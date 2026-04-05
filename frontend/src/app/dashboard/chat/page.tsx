@@ -121,9 +121,7 @@ export default function ChatPage() {
     formData.append('image', file);
 
     try {
-      const res = await api.post('/chat/image', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await api.post('/chat/image', formData);
       socketRef.current?.emit('send_message', res.data);
     } catch (err) {
       console.error(err);

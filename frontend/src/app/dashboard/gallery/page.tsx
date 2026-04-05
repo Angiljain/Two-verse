@@ -53,9 +53,7 @@ export default function GalleryPage() {
     formData.append('caption', caption);
 
     try {
-      await api.post('/memories', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await api.post('/memories', formData);
       setShowUpload(false);
       setSelectedFile(null);
       setPreviewUrl(null);
