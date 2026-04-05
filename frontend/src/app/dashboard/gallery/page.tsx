@@ -72,9 +72,10 @@ export default function GalleryPage() {
       await api.delete(`/memories/${id}`);
       setMemories(prev => prev.filter(m => m._id !== id));
       if (selectedImage?._id === id) setSelectedImage(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to delete:', err);
-      alert('Could not delete. Please try again.');
+      const msg = err?.response?.data?.message || err?.message || 'Unknown error';
+      alert(`Could not delete: ${msg}`);
     } finally {
       setDeletingId(null);
     }

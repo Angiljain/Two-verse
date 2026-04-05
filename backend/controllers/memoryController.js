@@ -33,35 +33,43 @@ export const uploadMemory = async (req, res) => {
 };
 
 export const deleteMemory = async (req, res) => {
-  const user = req.user;
-  if (!user.coupleId) return res.status(403).json({ message: 'Not paired' });
-
-  const memory = await Memory.findById(req.params.id);
-  
-  if (!memory) {
-    return res.status(404).json({ message: 'Memory not found' });
-  }
-
-  // To ensure the user can only delete memories belonging to their couple
-  if (memory.coupleId.toString() !== user.coupleId.toString()) {
-    return res.status(401).json({ message: 'Not authorized to delete this memory' });
-  }
-
-  // Attempt to delete local file if it exists
   try {
-    if (memory.url.includes('localhost')) {
-      const filename = memory.url.split('/').pop();
-      const fs = await import('fs');
-      const path = await import('path');
-      const filepath = path.join(process.cwd(), 'uploads', filename);
-      if (fs.existsSync(filepath)) {
-        fs.unlinkSync(filepath);
+    const user = req.user;
+    if (!user.coupleId) return res.status(403).json({ message: 'Not paired' });
+
+    const memory = await Memory.findById(req.params.id);
+    
+    if (!memory) {
+      return res.status(404).json({ message: 'Memory not found' });
+    }
+
+    // Compare both as strings to handle ObjectId vs string mismatches
+    const memoryCoupleId = memory.coupleId?.toString();
+    const userCoupleId = user.coupleId?.toString();
+
+    console.log('Delete attempt - memory coupleId:', memoryCoupleId, '| user coupleId:', userCoupleId);
+
+    if (memoryCoupleId !== userCoupleId) {
+      return res.status(401).json({ message: 'Not authorized to delete this memory' });
+    }
+
+    // Attempt to delete local file if it exists
+    if (memory.url && memory.url.includes('localhost')) {
+      try {
+        const filename = memory.url.split('/uploads/').pop();
+        const { existsSync, unlinkSync } = await import('fs');
+        const { join } = await import('path');
+        const filepath = join(process.cwd(), 'uploads', filename);
+        if (existsSync(filepath)) unlinkSync(filepath);
+      } catch (e) {
+        console.error('File cleanup failed', e);
       }
     }
-  } catch (e) {
-    console.error('File cleanup failed', e);
-  }
 
-  await Memory.findByIdAndDelete(req.params.id);
-  res.json({ message: 'Memory removed' });
+    await Memory.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Memory removed' });
+  } catch (err) {
+    console.error('Delete memory error:', err);
+    res.status(500).json({ message: 'Server error while deleting memory', error: err.message });
+  }
 };
