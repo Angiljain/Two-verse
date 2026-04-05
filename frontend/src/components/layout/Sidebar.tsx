@@ -19,7 +19,7 @@ export default function Sidebar() {
   const partnerName = typeof user?.partner === 'object' ? (user.partner as any).name : user?.partner;
 
   return (
-    <aside className="w-64 glass-panel border-r border-white/10 flex flex-col h-full bg-black/40">
+    <aside className="hidden md:flex w-64 glass-panel border-r border-white/10 flex-col h-full bg-black/40">
       <div className="p-6">
         <h1 className="text-2xl font-bold text-gradient flex items-center gap-2">
           <Heart className="w-6 h-6 text-primary fill-primary" /> TwoVerse

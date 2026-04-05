@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 
+import BottomNav from '../../components/layout/BottomNav';
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -21,14 +23,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden">
+    <div className="flex h-[100dvh] bg-black text-white overflow-hidden pb-16 md:pb-0">
       <Sidebar />
       <main className="flex-1 overflow-y-auto w-full relative">
         <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[150px] pointer-events-none" />
-        <div className="relative z-10 p-6 max-w-6xl mx-auto min-h-full">
+        <div className="relative z-10 p-4 md:p-6 max-w-6xl mx-auto min-h-full">
           {children}
         </div>
       </main>
+      <BottomNav />
     </div>
   );
 }
