@@ -174,6 +174,23 @@ export default function GalleryPage() {
             onClick={e => e.stopPropagation()}
            >
              <img src={selectedImage.url} alt={selectedImage.caption} className="w-full max-h-[80vh] object-contain rounded-xl" />
+             <div className="absolute top-4 right-4 flex gap-4 bg-black/60 backdrop-blur-md rounded-full p-2">
+                 <button 
+                    onClick={async (e) => {
+                       e.stopPropagation();
+                       if (confirm('Are you sure you want to delete this memory?')) {
+                          try {
+                             await api.delete(`/memories/${selectedImage._id}`);
+                             setMemories(prev => prev.filter(m => m._id !== selectedImage._id));
+                             setSelectedImage(null);
+                          } catch (err) { console.error('Failed to delete memory', err); }
+                       }
+                    }}
+                    className="p-2 text-white hover:text-red-500 transition-colors bg-white/10 rounded-full"
+                 >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                 </button>
+             </div>
              {selectedImage.caption && (
                <div className="p-4 text-center mt-4 glass-panel rounded-xl">
                  <p className="text-lg">{selectedImage.caption}</p>

@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import { getMemories, uploadMemory } from '../controllers/memoryController.js';
+import { getMemories, uploadMemory, deleteMemory } from '../controllers/memoryController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -26,5 +26,8 @@ const upload = multer({ storage: storage });
 router.route('/')
   .get(protect, getMemories)
   .post(protect, upload.single('image'), uploadMemory);
+
+router.route('/:id')
+  .delete(protect, deleteMemory);
 
 export default router;

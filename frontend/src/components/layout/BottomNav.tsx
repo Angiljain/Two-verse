@@ -1,10 +1,12 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Heart, MessageSquare, Calendar, Image as ImageIcon, Lock } from 'lucide-react';
+import { Heart, MessageSquare, Calendar, Image as ImageIcon, Lock, LogOut } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   const navItems = [
     { name: 'Home', icon: <Heart className="w-5 h-5" />, path: '/dashboard' },
@@ -30,6 +32,14 @@ export default function BottomNav() {
             </Link>
           );
         })}
+        <button onClick={logout} className="flex-1 flex flex-col items-center justify-center gap-1 h-full group">
+           <div className={`transition-colors text-white/60 group-hover:text-red-400`}>
+              <LogOut className="w-5 h-5" />
+           </div>
+           <span className={`text-[10px] font-medium transition-colors text-white/60 group-hover:text-red-400`}>
+              Log out
+           </span>
+        </button>
       </div>
     </nav>
   );

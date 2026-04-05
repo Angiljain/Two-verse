@@ -6,11 +6,14 @@ import { Send, Image as ImageIcon, Heart } from 'lucide-react';
 import { io, Socket } from 'socket.io-client';
 import api from '../../../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
+import EmojiPicker, { Theme, EmojiClickData } from 'emoji-picker-react';
+import { Smile } from 'lucide-react';
 
 interface Message {
   _id: string;
   senderId: string;
-  content: string;
+  content?: string;
+  imageUrl?: string;
   mood: string;
   createdAt: string;
 }
@@ -19,8 +22,10 @@ export default function ChatPage() {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputVal, setInputVal] = useState('');
+  const [showEmoji, setShowEmoji] = useState(false);
   const socketRef = useRef<Socket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -61,14 +66,34 @@ export default function ChatPage() {
     if (!inputVal.trim() || !user) return;
 
     try {
-      const localId = Date.now().toString(); // optimistic 
       const res = await api.post('/chat', { content: inputVal, mood: 'normal' });
       socketRef.current?.emit('send_message', res.data);
       setInputVal('');
-      // Message is appended via receive_message since server broadcasts back to the room
+      setShowEmoji(false);
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await api.post('/chat/image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      socketRef.current?.emit('send_message', res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const onEmojiClick = (emojiData: EmojiClickData) => {
+    setInputVal(prev => prev + emojiData.emoji);
   };
 
   const partnerName = typeof user?.partner === 'object' ? (user.partner as any).name : user?.partner;
@@ -102,6 +127,9 @@ export default function ChatPage() {
                   className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
                 >
                   <div className={`max-w-[70%] rounded-2xl px-4 py-2 text-sm ${isMine ? 'bg-primary text-white rounded-br-none' : 'glass-panel text-white/90 rounded-bl-none'}`}>
+                    {msg.imageUrl && (
+                       <img src={msg.imageUrl} alt="attachment" className="rounded-xl mb-2 max-w-full max-h-48 object-cover" />
+                    )}
                     {msg.content}
                     <span className="text-[10px] opacity-60 block text-right mt-1">
                       {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -115,9 +143,25 @@ export default function ChatPage() {
         <div ref={messagesEndRef} />
       </div>
 
+      {showEmoji && (
+        <div className="absolute bottom-20 right-4 z-50">
+          <EmojiPicker theme={Theme.DARK} onEmojiClick={onEmojiClick} />
+        </div>
+      )}
+
       <form onSubmit={sendMessage} className="p-4 border-t border-white/10 bg-black/40 backdrop-blur-md flex items-center gap-2">
-        <button type="button" className="p-2 text-white/50 hover:text-white transition-colors">
+        <input 
+          type="file" 
+          accept="image/*" 
+          className="hidden" 
+          ref={fileInputRef} 
+          onChange={handleImageUpload} 
+        />
+        <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2 text-white/50 hover:text-white transition-colors">
           <ImageIcon className="w-5 h-5" />
+        </button>
+        <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2 text-white/50 hover:text-white transition-colors">
+          <Smile className="w-5 h-5" />
         </button>
         <input 
           value={inputVal}
