@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
-import { Image as ImageIcon, Plus, Heart, Upload } from 'lucide-react';
+import { Image as ImageIcon, Plus, Heart, Upload, Trash2, X } from 'lucide-react';
 import api from '../../../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -20,6 +20,7 @@ export default function GalleryPage() {
   const [caption, setCaption] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<Memory | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchMemories = async () => {
@@ -64,6 +65,21 @@ export default function GalleryPage() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this memory permanently?')) return;
+    setDeletingId(id);
+    try {
+      await api.delete(`/memories/${id}`);
+      setMemories(prev => prev.filter(m => m._id !== id));
+      if (selectedImage?._id === id) setSelectedImage(null);
+    } catch (err) {
+      console.error('Failed to delete:', err);
+      alert('Could not delete. Please try again.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div className="space-y-8 pb-10">
       <div className="flex justify-between items-end">
@@ -89,11 +105,25 @@ export default function GalleryPage() {
                 key={mem._id}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
                 className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer"
-                onClick={() => setSelectedImage(mem)}
               >
-                <img src={mem.url} alt={mem.caption} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                <img
+                  src={mem.url}
+                  alt={mem.caption}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  onClick={() => setSelectedImage(mem)}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDelete(mem._id); }}
+                    disabled={deletingId === mem._id}
+                    className="self-end bg-red-500/80 hover:bg-red-600 text-white rounded-full p-1.5 transition-colors"
+                  >
+                    {deletingId === mem._id
+                      ? <span className="w-4 h-4 block border-2 border-white/50 border-t-white rounded-full animate-spin" />
+                      : <Trash2 className="w-4 h-4" />}
+                  </button>
                   <p className="text-sm font-medium line-clamp-2">{mem.caption}</p>
                 </div>
               </motion.div>
@@ -161,38 +191,40 @@ export default function GalleryPage() {
 
         {selectedImage && (
           <div 
-            className="fixed inset-0 bg-black/95 backdrop-blur-lg z-50 flex items-center justify-center p-4 cursor-zoom-out"
+            className="fixed inset-0 bg-black/95 backdrop-blur-lg z-50 flex items-center justify-center p-4"
             onClick={() => setSelectedImage(null)}
           >
            <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="max-w-4xl max-h-[90vh] flex flex-col outline-none overflow-hidden cursor-default"
+            className="relative max-w-4xl w-full max-h-[90vh] flex flex-col outline-none cursor-default"
             onClick={e => e.stopPropagation()}
            >
-             <img src={selectedImage.url} alt={selectedImage.caption} className="w-full max-h-[80vh] object-contain rounded-xl" />
-             <div className="absolute top-4 right-4 flex gap-4 bg-black/60 backdrop-blur-md rounded-full p-2">
-                 <button 
-                    onClick={async (e) => {
-                       e.stopPropagation();
-                       if (confirm('Are you sure you want to delete this memory?')) {
-                          try {
-                             await api.delete(`/memories/${selectedImage._id}`);
-                             setMemories(prev => prev.filter(m => m._id !== selectedImage._id));
-                             setSelectedImage(null);
-                          } catch (err) { console.error('Failed to delete memory', err); }
-                       }
-                    }}
-                    className="p-2 text-white hover:text-red-500 transition-colors bg-white/10 rounded-full"
-                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                 </button>
+             {/* Top action bar */}
+             <div className="absolute top-3 right-3 z-10 flex gap-2">
+               <button
+                 onClick={() => handleDelete(selectedImage._id)}
+                 disabled={deletingId === selectedImage._id}
+                 className="bg-red-500/90 hover:bg-red-600 text-white rounded-full p-2.5 transition-colors shadow-lg"
+               >
+                 {deletingId === selectedImage._id
+                   ? <span className="w-5 h-5 block border-2 border-white/50 border-t-white rounded-full animate-spin" />
+                   : <Trash2 className="w-5 h-5" />}
+               </button>
+               <button
+                 onClick={() => setSelectedImage(null)}
+                 className="bg-white/10 hover:bg-white/20 text-white rounded-full p-2.5 transition-colors shadow-lg"
+               >
+                 <X className="w-5 h-5" />
+               </button>
              </div>
+
+             <img src={selectedImage.url} alt={selectedImage.caption} className="w-full max-h-[80vh] object-contain rounded-xl" />
              {selectedImage.caption && (
-               <div className="p-4 text-center mt-4 glass-panel rounded-xl">
+               <div className="p-4 text-center mt-3 glass-panel rounded-xl">
                  <p className="text-lg">{selectedImage.caption}</p>
-                 <span className="text-xs text-white/50 mt-1">{new Date(selectedImage.createdAt).toLocaleDateString()}</span>
+                 <span className="text-xs text-white/50 mt-1 block">{new Date(selectedImage.createdAt).toLocaleDateString()}</span>
                </div>
              )}
            </motion.div>

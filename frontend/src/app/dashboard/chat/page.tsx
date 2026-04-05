@@ -2,12 +2,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { Button } from '../../../components/ui/Button';
-import { Send, Image as ImageIcon, Heart } from 'lucide-react';
+import { Send, Image as ImageIcon, Heart, Smile } from 'lucide-react';
 import { io, Socket } from 'socket.io-client';
 import api from '../../../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import EmojiPicker, { Theme, EmojiClickData } from 'emoji-picker-react';
-import { Smile } from 'lucide-react';
+import { useNotifications } from '../../../hooks/useNotifications';
 
 interface Message {
   _id: string;
@@ -21,6 +21,7 @@ interface Message {
 
 export default function ChatPage() {
   const { user } = useAuth();
+  const { notify } = useNotifications();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputVal, setInputVal] = useState('');
   const [showEmoji, setShowEmoji] = useState(false);
@@ -61,6 +62,9 @@ export default function ChatPage() {
         });
         if (msg.senderId !== user._id) {
            socket.emit('mark_seen', { coupleId: user.coupleId, receiverId: user._id });
+           // Fire browser notification if app is in background
+           const body = msg.imageUrl ? '📷 Sent you a photo' : (msg.content || '');
+           notify('💌 New message from your partner', body);
         }
         setTimeout(scrollToBottom, 50);
       });
