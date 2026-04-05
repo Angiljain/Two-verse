@@ -66,16 +66,22 @@ export default function GalleryPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!id) {
+      alert('Error: Memory ID is missing. Please refresh the page.');
+      return;
+    }
     if (!confirm('Delete this memory permanently?')) return;
     setDeletingId(id);
+    console.log('Deleting memory with ID:', id);
     try {
-      await api.delete(`/memories/${id}`);
+      const res = await api.delete(`/memories/${id}`);
+      console.log('Delete response:', res.data);
       setMemories(prev => prev.filter(m => m._id !== id));
       if (selectedImage?._id === id) setSelectedImage(null);
     } catch (err: any) {
-      console.error('Failed to delete:', err);
+      console.error('Failed to delete:', err?.response?.status, err?.response?.data);
       const msg = err?.response?.data?.message || err?.message || 'Unknown error';
-      alert(`Could not delete: ${msg}`);
+      alert(`Could not delete (${err?.response?.status}): ${msg}`);
     } finally {
       setDeletingId(null);
     }

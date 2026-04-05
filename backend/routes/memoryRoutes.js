@@ -40,11 +40,8 @@ if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY) {
   upload = multer({ storage });
 }
 
-router.route('/')
-  .get(protect, getMemories)
-  .post(protect, upload.single('image'), uploadMemory);
-
-router.route('/:id')
-  .delete(protect, deleteMemory);
+router.get('/', protect, getMemories);
+router.post('/', protect, upload.single('image'), uploadMemory);
+router.delete('/:id', protect, deleteMemory);
 
 export default router;
