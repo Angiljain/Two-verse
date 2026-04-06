@@ -1,8 +1,9 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../context/AuthContext';
 import { Button } from '../../../components/ui/Button';
-import { Send, Image as ImageIcon, Heart, Smile } from 'lucide-react';
+import { Send, Image as ImageIcon, Heart, Smile, ChevronLeft } from 'lucide-react';
 import { io, Socket } from 'socket.io-client';
 import api from '../../../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -21,6 +22,7 @@ interface Message {
 
 export default function ChatPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const { notify } = useNotifications();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputVal, setInputVal] = useState('');
@@ -139,8 +141,14 @@ export default function ChatPage() {
   const partnerName = typeof user?.partner === 'object' ? (user.partner as any).name : user?.partner;
 
   return (
-    <div className="flex-1 flex flex-col glass-panel rounded-3xl overflow-hidden relative">
-      <div className="p-4 border-b border-white/10 flex items-center bg-black/40 backdrop-blur-md z-10">
+    <div className="flex-1 flex flex-col glass-panel md:rounded-3xl overflow-hidden relative border-0 md:border">
+      <div className="p-4 border-b border-white/10 flex items-center bg-black/40 backdrop-blur-md z-10 sticky top-0">
+        <button 
+          onClick={() => router.push('/dashboard')}
+          className="mr-3 p-2 -ml-2 rounded-full md:hidden text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
         <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center font-bold">
           {partnerName?.charAt(0) || 'P'}
         </div>

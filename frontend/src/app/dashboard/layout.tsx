@@ -1,6 +1,6 @@
 'use client';
 import { useAuth } from '../../context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Sidebar from '../../components/layout/Sidebar';
 
@@ -18,20 +18,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [user, loading, router]);
 
+  const pathname = usePathname();
+  const isChat = pathname === '/dashboard/chat';
+
   if (loading || !user || !user.coupleId) {
     return <div className="min-h-screen flex items-center justify-center bg-black">Loading TwoVerse...</div>;
   }
 
   return (
-    <div className="flex h-[100dvh] bg-black text-white overflow-hidden pb-16 md:pb-0">
+    <div className={`flex h-[100dvh] bg-black text-white overflow-hidden ${isChat ? '' : 'pb-16 md:pb-0'}`}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto w-full relative">
         <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[150px] pointer-events-none" />
-        <div className="relative z-10 p-4 md:p-6 max-w-6xl mx-auto h-full flex flex-col">
+        <div className={`relative z-10 mx-auto h-full flex flex-col ${isChat ? 'p-0 max-w-none' : 'p-4 md:p-6 max-w-6xl'}`}>
           {children}
         </div>
       </main>
-      <BottomNav />
+      {!isChat && <BottomNav />}
     </div>
   );
 }
