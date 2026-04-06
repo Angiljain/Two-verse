@@ -104,6 +104,35 @@ export const joinPartner = async (req, res) => {
   res.json({ message: 'Successfully paired', coupleId: couple._id, partnerName: partner.name });
 };
 
+export const getCoupleInfo = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).populate('partnerId', 'name email inviteCode createdAt');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    let coupleStartDate = null;
+    if (user.coupleId) {
+      const couple = await Couple.findById(user.coupleId);
+      coupleStartDate = couple?.startDate || couple?.createdAt || null;
+    }
+
+    res.json({
+      partner: user.partnerId
+        ? {
+            _id: user.partnerId._id,
+            name: user.partnerId.name,
+            email: user.partnerId.email,
+            joinedAt: user.partnerId.createdAt,
+          }
+        : null,
+      coupleStartDate,
+      coupleId: user.coupleId,
+    });
+  } catch (err) {
+    console.error('getCoupleInfo error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 export const getUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id).populate('partnerId', 'name email');
   if (user) {

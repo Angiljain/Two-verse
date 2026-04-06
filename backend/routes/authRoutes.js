@@ -17,5 +17,6 @@ router.get('/profile', protect, getUserProfile);
 // Couple specific routes
 router.post('/couple/invite', protect, generateInvite);
 router.post('/couple/join', protect, joinPartner);
+router.get('/couple/info', protect, getCoupleInfo);
 
 export default router;
