@@ -49,49 +49,53 @@ export default function VaultPage() {
 
   const getCategoryColor = (cat: string) => {
     switch(cat) {
-      case 'Love': return 'bg-pink-500/20 text-pink-300';
-      case 'Apology': return 'bg-blue-500/20 text-blue-300';
-      case 'Memory': return 'bg-orange-500/20 text-orange-300';
-      default: return 'bg-purple-500/20 text-purple-300';
+      case 'Love': return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+      case 'Apology': return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20';
+      case 'Memory': return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+      default: return 'bg-violet-500/10 text-violet-400 border-violet-500/20';
     }
   };
 
   return (
-    <div className="space-y-8 pb-10">
-      <div className="flex justify-between items-end">
+    <div className="space-y-8 pb-10 pt-4 px-2">
+      <div className="flex justify-between items-center bg-[#09090b]/80 backdrop-blur-xl sticky top-0 z-20 py-2 border-b border-white/[0.02]">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2"><Lock className="w-8 h-8 text-primary" /> Love Notes Vault</h1>
-          <p className="text-white/60 mt-1">A secure place for deep feelings and long-form memories.</p>
+          <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] font-bold mb-1">Inner Thoughts</p>
+          <h1 className="text-3xl font-light tracking-tight text-zinc-100 flex items-center gap-2">
+            The Vault
+          </h1>
         </div>
-        <Button onClick={() => setShowModal(true)} className="flex items-center gap-2 px-6">
-          <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Write a Note</span>
-        </Button>
+        <button 
+          onClick={() => setShowModal(true)} 
+          className="w-10 h-10 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-zinc-300 hover:bg-primary/20 hover:text-primary transition-colors hover:border-primary/30"
+        >
+          <Plus className="w-5 h-5" />
+        </button>
       </div>
 
-      <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+      <div className="columns-1 sm:columns-2 gap-4 space-y-4">
         <AnimatePresence>
           {notes.map((note) => (
             <motion.div 
               key={note._id}
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="glass-panel p-6 rounded-3xl break-inside-avoid relative overflow-hidden group inline-block w-full"
+              className="bg-[#18181b] border border-white/[0.05] p-6 rounded-[24px] break-inside-avoid relative overflow-hidden group inline-block w-full shadow-lg"
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="flex justify-between items-start mb-4">
-                <span className={`text-xs px-3 py-1 rounded-full font-medium ${getCategoryColor(note.category)}`}>
+              <div className="flex justify-between items-start mb-5">
+                <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider border ${getCategoryColor(note.category)}`}>
                   {note.category}
                 </span>
                 {note.deliveryDate && new Date(note.deliveryDate) > new Date() && (
-                  <span className="text-xs text-white/40 flex items-center gap-1">
-                    <CalendarIcon className="w-3 h-3" /> Locks until {new Date(note.deliveryDate).toLocaleDateString()}
+                  <span className="text-[10px] text-zinc-500 flex items-center gap-1.5 font-bold uppercase tracking-wider">
+                    <CalendarIcon className="w-3.5 h-3.5 text-zinc-400" /> {new Date(note.deliveryDate).toLocaleDateString()}
                   </span>
                 )}
               </div>
-              <h3 className="text-xl font-bold mb-2">{note.title}</h3>
-              <p className="text-white/80 whitespace-pre-wrap text-sm leading-relaxed mb-4">{note.content}</p>
-              <div className="flex justify-between items-center text-xs text-white/40 border-t border-white/5 pt-4 mt-4">
-                <span>By {note.author?.name || 'Unknown'}</span>
+              <h3 className="text-xl font-semibold tracking-tight text-zinc-100 mb-3">{note.title}</h3>
+              <p className="text-zinc-400 whitespace-pre-wrap text-sm leading-relaxed mb-6 font-medium">{note.content}</p>
+              <div className="flex justify-between items-center text-[10px] text-zinc-600 font-bold uppercase tracking-widest pt-4 border-t border-white/[0.05]">
+                <span>{note.author?.name || 'Unknown'}</span>
                 <span>{new Date(note.createdAt).toLocaleDateString()}</span>
               </div>
             </motion.div>
@@ -99,35 +103,37 @@ export default function VaultPage() {
         </AnimatePresence>
 
         {notes.length === 0 && (
-          <div className="col-span-full h-64 flex flex-col items-center justify-center text-white/40 glass-panel rounded-3xl">
-            <Heart className="w-12 h-12 text-primary/30 mb-2" />
-            <p>Your vault is empty. Write your first note.</p>
+          <div className="col-span-full h-[300px] flex flex-col items-center justify-center text-zinc-500 glass-panel rounded-[32px] border border-white/[0.02]">
+            <Lock className="w-8 h-8 opacity-40 mb-3" />
+            <p className="font-medium tracking-wide">The vault is quiet.</p>
           </div>
         )}
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-[#09090b]/90 backdrop-blur-lg z-50 flex items-center justify-center p-4">
           <motion.div 
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="glass-panel w-full max-w-xl rounded-3xl p-8"
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.98 }}
+            className="bg-[#18181b] w-full max-w-lg rounded-[32px] p-8 border border-white/[0.05] shadow-2xl"
           >
-            <h2 className="text-2xl font-bold mb-6">Write a Note</h2>
-            <form onSubmit={handleCreateNote} className="space-y-4">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-light tracking-tight text-zinc-100">Draft a Note</h2>
+            </div>
+            <form onSubmit={handleCreateNote} className="space-y-5">
               <Input 
                 label="Title" 
-                placeholder="A letter to my love..." 
+                placeholder="A midnight thought..." 
                 value={newNote.title}
                 onChange={e => setNewNote({...newNote, title: e.target.value})}
                 required
               />
               
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-white/80">Category</label>
+                <label className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">Category</label>
                 <select 
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none"
+                  className="w-full bg-[#09090b] border border-white/[0.05] rounded-2xl px-4 py-3.5 text-zinc-300 outline-none focus:border-primary/50 transition-colors cursor-pointer appearance-none"
                   value={newNote.category}
                   onChange={e => setNewNote({...newNote, category: e.target.value})}
                 >
@@ -139,11 +145,11 @@ export default function VaultPage() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-white/80">Message</label>
+                <label className="text-[10px] font-bold tracking-widest uppercase text-zinc-500">Message</label>
                 <textarea 
-                  rows={6}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/40 outline-none focus:border-primary transition-colors"
-                  placeholder="Express your feelings..."
+                  rows={5}
+                  className="w-full bg-[#09090b] border border-white/[0.05] rounded-2xl px-4 py-3.5 text-zinc-300 placeholder:text-zinc-600 outline-none focus:border-primary/50 transition-colors resize-none"
+                  placeholder="Express your feelings intimately..."
                   value={newNote.content}
                   onChange={e => setNewNote({...newNote, content: e.target.value})}
                   required
@@ -151,19 +157,19 @@ export default function VaultPage() {
               </div>
 
               <Input 
-                label="Deliver on (Optional for surprises)" 
+                label="Deliver on (Optional surprises)" 
                 type="datetime-local" 
                 value={newNote.deliveryDate}
                 onChange={e => setNewNote({...newNote, deliveryDate: e.target.value})}
               />
 
-              <div className="flex items-center gap-4 pt-4 mt-4 border-t border-white/10">
-                <Button type="button" variant="ghost" onClick={() => setShowModal(false)} className="flex-1">
-                  Cancel
-                </Button>
-                <Button type="submit" className="flex-1">
-                  Save to Vault
-                </Button>
+              <div className="flex items-center gap-3 pt-6 mt-2">
+                <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-3.5 rounded-full font-semibold text-zinc-400 hover:text-zinc-200 hover:bg-white/5 transition-colors">
+                  Discard
+                </button>
+                <button type="submit" className="flex-1 py-3.5 rounded-full font-semibold bg-zinc-200 text-[#09090b] hover:bg-white transition-colors">
+                  Seal Vault
+                </button>
               </div>
             </form>
           </motion.div>

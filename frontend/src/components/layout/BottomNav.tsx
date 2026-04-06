@@ -18,32 +18,33 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 border-t border-white/10 bg-black/85 backdrop-blur-xl z-50">
-      <div className="flex items-center h-16 px-1">
+    <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-[360px]">
+      <nav className="glass-panel px-2 py-2 rounded-[28px] flex items-center justify-between">
         {navItems.map((item) => {
           const isActive =
             item.path === '/dashboard'
               ? pathname === '/dashboard'
               : pathname.startsWith(item.path);
+
           return (
             <Link
               key={item.path}
               href={item.path}
-              className="flex-1 flex flex-col items-center justify-center gap-0.5 h-full relative"
+              className="relative flex flex-col items-center justify-center p-2 rounded-2xl transition-all duration-300 w-16"
             >
               {isActive && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-primary" />
+                <div className="absolute inset-0 bg-primary/10 rounded-2xl border border-primary/20 shadow-[0_0_15px_rgba(225,29,72,0.2)]" />
               )}
-              <div className={`transition-all duration-200 ${isActive ? 'text-primary scale-110' : 'text-white/50'}`}>
+              <div className={`relative z-10 transition-all duration-300 ${isActive ? 'text-primary scale-110 drop-shadow-md' : 'text-zinc-500 hover:text-zinc-300'}`}>
                 {item.icon}
               </div>
-              <span className={`text-[10px] font-medium transition-colors ${isActive ? 'text-primary' : 'text-white/40'}`}>
+              <span className={`relative z-10 text-[9px] font-semibold mt-1 transition-colors ${isActive ? 'text-primary' : 'text-zinc-600'}`}>
                 {item.name}
               </span>
             </Link>
           );
         })}
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 }

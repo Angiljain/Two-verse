@@ -141,19 +141,26 @@ export default function ChatPage() {
   const partnerName = typeof user?.partner === 'object' ? (user.partner as any).name : user?.partner;
 
   return (
-    <div className="flex-1 flex flex-col glass-panel md:rounded-3xl overflow-hidden relative border-0 md:border">
-      <div className="p-4 border-b border-white/10 flex items-center bg-black/40 backdrop-blur-md z-10 sticky top-0">
-        <button 
-          onClick={() => router.push('/dashboard')}
-          className="mr-3 p-2 -ml-2 rounded-full md:hidden text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </button>
-        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center font-bold">
-          {partnerName?.charAt(0) || 'P'}
-        </div>
-        <div className="ml-3">
-          <h3 className="font-bold">{partnerName || 'Your Partner'}</h3>
+    <div className="flex-1 flex flex-col overflow-hidden relative">
+      {/* Header */}
+      <div className="p-4 flex items-center justify-between z-10 sticky top-0 bg-[#09090b]/80 backdrop-blur-xl border-b border-white/[0.02]">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => router.push('/dashboard')}
+            className="p-2 -ml-2 rounded-full md:hidden text-zinc-500 hover:text-white hover:bg-white/5 transition-colors"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <div className="relative">
+             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center font-bold text-zinc-200 border border-white/5 shadow-inner">
+               {partnerName?.charAt(0) || 'P'}
+             </div>
+             <div className="absolute right-0 bottom-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#09090b]" />
+          </div>
+          <div>
+            <h3 className="font-semibold tracking-tight text-zinc-100">{partnerName || 'Your Partner'}</h3>
+            <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-semibold">Active Now</p>
+          </div>
         </div>
       </div>
 
@@ -170,21 +177,27 @@ export default function ChatPage() {
               return (
                 <motion.div
                   key={msg._id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+                  initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  className={`flex ${isMine ? 'justify-end' : 'justify-start'} items-end gap-2 mb-2 group`}
                 >
-                  <div className={`max-w-[70%] rounded-2xl px-4 py-2 text-sm ${isMine ? 'bg-primary text-white rounded-br-none' : 'glass-panel text-white/90 rounded-bl-none'}`}>
+                  <div className={`relative max-w-[75%] px-4 py-3 text-[15px] leading-relaxed shadow-sm
+                    ${isMine 
+                      ? 'bg-gradient-to-tr from-primary to-accent text-white rounded-[24px] rounded-br-sm shadow-primary/20' 
+                      : 'bg-[#18181b] border border-white/[0.05] text-zinc-200 rounded-[24px] rounded-bl-sm'}`}
+                  >
                     {msg.imageUrl && (
-                       <img src={msg.imageUrl} onLoad={scrollToBottom} alt="attachment" className="rounded-xl mb-2 max-w-full max-h-48 object-cover" />
+                       <div className="relative overflow-hidden rounded-xl mb-2 -mx-2 -mt-1">
+                          <img src={msg.imageUrl} onLoad={scrollToBottom} alt="attachment" className="w-full max-h-[300px] object-cover" />
+                       </div>
                     )}
-                    {msg.content}
-                    <div className="flex items-center justify-end gap-1 mt-1 opacity-60">
-                      <span className="text-[10px] block text-right">
+                    <span className="break-words">{msg.content}</span>
+                    <div className={`flex items-center justify-end gap-1 mt-1 font-medium ${isMine ? 'opacity-80' : 'opacity-40'}`}>
+                      <span className="text-[9px] tracking-widest uppercase">
                         {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                       {isMine && (
-                        <span className="text-[10px] tracking-tighter w-3 ml-1 text-white">
+                        <span className="text-[10px] tracking-tighter w-3 ml-0.5">
                           {msg.seen ? '✓✓' : '✓'}
                         </span>
                       )}
@@ -214,30 +227,35 @@ export default function ChatPage() {
         </div>
       )}
 
-      <form onSubmit={sendMessage} className="p-2 sm:p-4 border-t border-white/10 bg-black/40 backdrop-blur-md flex items-center gap-1 sm:gap-2">
-        <input 
-          type="file" 
-          accept="image/*" 
-          className="hidden" 
-          ref={fileInputRef} 
-          onChange={handleImageUpload} 
-        />
-        <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2 text-white/50 hover:text-white transition-colors shrink-0">
-          <ImageIcon className="w-5 h-5" />
-        </button>
-        <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2 text-white/50 hover:text-white transition-colors shrink-0">
-          <Smile className="w-5 h-5" />
-        </button>
-        <input 
-          value={inputVal}
-          onChange={handleTyping}
-          placeholder="Message..."
-          className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-full px-3 py-2 sm:px-4 sm:py-3 outline-none focus:border-primary/50 transition-colors"
-        />
-        <Button type="submit" className="!rounded-full px-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shrink-0">
-          <Send className="w-4 h-4 sm:w-5 sm:h-5" />
-        </Button>
-      </form>
+      <div className="p-4 bg-gradient-to-t from-[#09090b] via-[#09090b]/80 to-transparent sticky bottom-0">
+        <form onSubmit={sendMessage} className="mx-auto max-w-3xl glass-panel p-1.5 rounded-full flex items-center gap-1 shadow-2xl shadow-black/50 border-white/[0.08]">
+          <input 
+            type="file" 
+            accept="image/*" 
+            className="hidden" 
+            ref={fileInputRef} 
+            onChange={handleImageUpload} 
+          />
+          <button type="button" onClick={() => fileInputRef.current?.click()} className="w-10 h-10 flex items-center justify-center rounded-full text-zinc-500 hover:text-zinc-200 hover:bg-white/5 transition-colors shrink-0">
+            <ImageIcon className="w-5 h-5" />
+          </button>
+          
+          <input 
+            value={inputVal}
+            onChange={handleTyping}
+            placeholder="Type a message..."
+            className="flex-1 min-w-0 bg-transparent px-3 py-2 text-[15px] outline-none text-zinc-200 placeholder:text-zinc-600 font-medium"
+          />
+          
+          <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="w-10 h-10 flex items-center justify-center rounded-full text-zinc-500 hover:text-zinc-200 hover:bg-white/5 transition-colors shrink-0">
+            <Smile className="w-5 h-5" />
+          </button>
+
+          <Button type="submit" className={`!rounded-full px-0 w-10 h-10 shrink-0 transition-transform ${inputVal.trim() ? 'scale-100 bg-primary shadow-lg shadow-primary/30' : 'scale-75 opacity-50 bg-zinc-800'}`}>
+             <Send className="w-4 h-4" />
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }

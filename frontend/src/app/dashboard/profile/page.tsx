@@ -62,174 +62,107 @@ export default function ProfilePage() {
   const days = coupleInfo?.coupleStartDate ? daysSince(coupleInfo.coupleStartDate) : null;
 
   return (
-    <div className="space-y-4 pb-24 max-w-lg mx-auto">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <User className="w-6 h-6 text-primary" /> Profile
+    <div className="space-y-6 pb-24 max-w-lg mx-auto pt-6 px-4">
+      {/* Editorial Header */}
+      <div className="mb-8">
+        <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] font-bold mb-1">Your Identity</p>
+        <h1 className="text-4xl font-light tracking-tight text-zinc-100">
+          The <span className="font-semibold text-gradient">TwoVerse</span> Card.
         </h1>
-        <p className="text-white/50 text-sm mt-0.5">Your account & couple info</p>
       </div>
 
-      {/* Avatar + Name */}
+      {/* Glossy ID Card */}
       <motion.div
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-        className="glass-panel rounded-3xl p-6 flex flex-col items-center text-center"
+        className="relative rounded-[32px] p-8 overflow-hidden bg-[#18181b] border border-white/[0.05] shadow-2xl"
       >
-        <div className="relative">
-          <div className="w-22 h-22 w-[88px] h-[88px] rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-3xl font-bold shadow-lg shadow-primary/30">
-            {initials}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/20 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+        
+        <div className="relative z-10 flex flex-col items-center text-center">
+          <div className="relative">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center text-4xl font-bold shadow-lg shadow-primary/30 border-2 border-[#18181b]">
+              {initials}
+            </div>
           </div>
-          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-black flex items-center justify-center">
-            <Sparkles className="w-3 h-3 text-white" />
-          </div>
+          <h2 className="text-3xl font-light tracking-tight mt-6 text-zinc-100">{user?.name}</h2>
+          <p className="text-zinc-500 text-sm mt-1">{user?.email}</p>
+          
+          {user?.coupleId && (
+            <div className="mt-8 pt-6 border-t border-white/[0.05] w-full flex items-center justify-between">
+               <div className="text-left">
+                  <p className="text-zinc-500 uppercase tracking-[0.15em] text-[10px] font-bold">Status</p>
+                  <p className="text-primary font-medium mt-1 flex items-center gap-1.5"><Heart className="w-4 h-4 fill-primary/50" /> Paired</p>
+               </div>
+               <div className="text-right">
+                  <p className="text-zinc-500 uppercase tracking-[0.15em] text-[10px] font-bold">Days</p>
+                  <p className="text-zinc-100 font-mono font-medium mt-1 text-lg leading-none">{days !== null ? days : '--'}</p>
+               </div>
+            </div>
+          )}
         </div>
-        <h2 className="text-xl font-bold mt-3">{user?.name}</h2>
-        <p className="text-white/50 text-sm mt-0.5">{user?.email}</p>
-        {user?.coupleId && (
-          <div className="mt-3 flex items-center gap-2 bg-primary/20 text-primary rounded-full px-4 py-1.5 text-xs font-semibold">
-            <Heart className="w-3.5 h-3.5 fill-primary" /> Paired & Connected
-          </div>
-        )}
       </motion.div>
 
-      {/* Days Together Banner */}
-      {days !== null && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-          className="rounded-3xl p-5 flex items-center justify-between bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/20"
-        >
-          <div>
-            <p className="text-xs text-white/50 uppercase tracking-widest font-semibold">Together Since</p>
-            <p className="text-lg font-bold mt-0.5">
-              {coupleInfo?.coupleStartDate ? formatDate(coupleInfo.coupleStartDate) : '—'}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-4xl font-black text-primary">{days}</p>
-            <p className="text-xs text-white/50">days together 💕</p>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Partner Card */}
+      {/* Partner Minimalist Card */}
       {coupleInfo?.partner && (
         <motion.div
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="glass-panel rounded-3xl p-5 space-y-4"
+          className="glass-panel rounded-3xl p-6"
         >
-          <p className="text-xs text-white/40 uppercase tracking-widest font-semibold">Your Partner</p>
+          <div className="flex items-center justify-between">
+            <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] font-bold mb-4">Your Partner</p>
+            <Link2 className="w-4 h-4 text-zinc-600" />
+          </div>
 
-          {/* Avatar row */}
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-secondary to-primary flex items-center justify-center font-bold text-lg flex-shrink-0">
+          <div className="flex items-center gap-5">
+            <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-xl flex-shrink-0 border border-white/[0.05] text-zinc-300">
               {partnerInitials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-lg leading-tight">{coupleInfo.partner.name}</p>
-              <p className="text-white/50 text-sm truncate">{coupleInfo.partner.email}</p>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-              <Link2 className="w-4 h-4 text-primary" />
-            </div>
-          </div>
-
-          {/* Partner stats */}
-          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/10">
-            <div className="bg-white/5 rounded-2xl p-3">
-              <div className="flex items-center gap-1.5 text-white/40 mb-1">
-                <Calendar className="w-3.5 h-3.5" />
-                <span className="text-[10px] uppercase tracking-wider font-medium">Joined TwoVerse</span>
-              </div>
-              <p className="text-sm font-semibold">
-                {coupleInfo.partner.joinedAt ? formatDate(coupleInfo.partner.joinedAt) : '—'}
-              </p>
-            </div>
-            <div className="bg-white/5 rounded-2xl p-3">
-              <div className="flex items-center gap-1.5 text-white/40 mb-1">
-                <Clock className="w-3.5 h-3.5" />
-                <span className="text-[10px] uppercase tracking-wider font-medium">Days Together</span>
-              </div>
-              <p className="text-sm font-semibold text-primary">{days ?? '—'} days</p>
+              <p className="font-semibold text-xl leading-tight text-zinc-200">{coupleInfo.partner.name}</p>
+              <p className="text-zinc-500 text-sm truncate mt-1">{coupleInfo.partner.email}</p>
             </div>
           </div>
         </motion.div>
       )}
 
-      {/* Your Account Details */}
+      {/* Settings / Controls */}
       <motion.div
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-        className="glass-panel rounded-3xl p-5 space-y-4"
+        className="glass-panel rounded-3xl overflow-hidden"
       >
-        <p className="text-xs text-white/40 uppercase tracking-widest font-semibold">Your Account</p>
-
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center flex-shrink-0">
-            <User className="w-4 h-4 text-white/60" />
-          </div>
-          <div>
-            <p className="text-xs text-white/40">Full Name</p>
-            <p className="font-medium">{user?.name}</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Mail className="w-4 h-4 text-white/60" />
-          </div>
-          <div>
-            <p className="text-xs text-white/40">Email</p>
-            <p className="font-medium">{user?.email}</p>
-          </div>
-        </div>
-
         {user?.inviteCode && (
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Key className="w-4 h-4 text-white/60" />
-            </div>
-            <div className="flex-1">
-              <p className="text-xs text-white/40">Your Invite Code</p>
-              <p className="font-mono font-bold text-primary tracking-widest text-lg">{user.inviteCode}</p>
+          <div className="flex items-center justify-between p-6 border-b border-white/[0.05]">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-white/[0.03] rounded-2xl flex items-center justify-center flex-shrink-0">
+                <Key className="w-5 h-5 text-zinc-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Pairing Code</p>
+                <p className="font-mono text-zinc-200 text-lg mt-0.5">{user.inviteCode}</p>
+              </div>
             </div>
             <button
               onClick={copyInviteCode}
-              className="w-9 h-9 bg-primary/20 hover:bg-primary/40 rounded-xl flex items-center justify-center transition-colors"
+              className="w-10 h-10 bg-white/[0.03] hover:bg-white/[0.08] rounded-2xl flex items-center justify-center transition-colors"
             >
               {copied
-                ? <Check className="w-4 h-4 text-green-400" />
-                : <Copy className="w-4 h-4 text-primary" />}
+                ? <Check className="w-4 h-4 text-emerald-400" />
+                : <Copy className="w-4 h-4 text-zinc-400" />}
             </button>
           </div>
         )}
-      </motion.div>
-
-      {/* Privacy */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-        className="glass-panel rounded-3xl p-4"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Shield className="w-4 h-4 text-green-400" />
-          </div>
-          <div>
-            <p className="font-medium text-sm">End-to-End Private</p>
-            <p className="text-xs text-white/40">Only you and your partner can see your content</p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Sign Out */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-      >
+        
         <button
           onClick={logout}
-          className="w-full flex items-center justify-center gap-3 p-4 rounded-2xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-semibold transition-all active:scale-95"
+          className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition-colors group"
         >
-          <LogOut className="w-5 h-5" />
-          Sign Out
+           <div className="flex items-center gap-4">
+             <div className="w-10 h-10 bg-rose-500/10 rounded-2xl flex items-center justify-center group-hover:bg-rose-500/20 transition-colors">
+                <LogOut className="w-5 h-5 text-rose-500" />
+             </div>
+             <span className="font-medium text-zinc-300 group-hover:text-rose-400 transition-colors">Sign Out Completely</span>
+           </div>
         </button>
       </motion.div>
     </div>

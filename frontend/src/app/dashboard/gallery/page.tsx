@@ -88,15 +88,20 @@ export default function GalleryPage() {
   };
 
   return (
-    <div className="space-y-8 pb-10">
-      <div className="flex justify-between items-end">
+    <div className="space-y-8 pb-10 pt-4 px-2">
+      <div className="flex justify-between items-center bg-[#09090b]/80 backdrop-blur-xl sticky top-0 z-20 py-2 border-b border-white/[0.02]">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2"><ImageIcon className="w-8 h-8 text-primary" /> Memory Gallery</h1>
-          <p className="text-white/60 mt-1">A timeline of your captured moments.</p>
+          <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] font-bold mb-1">Visuals</p>
+          <h1 className="text-3xl font-light tracking-tight text-zinc-100 flex items-center gap-2">
+            Gallery
+          </h1>
         </div>
-        <Button onClick={() => setShowUpload(true)} className="flex items-center gap-2 px-6">
-          <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Upload Memory</span>
-        </Button>
+        <button 
+          onClick={() => setShowUpload(true)} 
+          className="w-10 h-10 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-zinc-300 hover:bg-primary/20 hover:text-primary transition-colors hover:border-primary/30"
+        >
+          <Plus className="w-5 h-5" />
+        </button>
       </div>
 
       {memories.length === 0 ? (
@@ -110,28 +115,30 @@ export default function GalleryPage() {
             {memories.map((mem) => (
               <motion.div 
                 key={mem._id}
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer"
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="group relative aspect-square rounded-[20px] overflow-hidden cursor-pointer border border-white/[0.05] shadow-lg"
               >
                 <img
                   src={mem.url}
                   alt={mem.caption}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   onClick={() => setSelectedImage(mem)}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleDelete(mem._id); }}
-                    disabled={deletingId === mem._id}
-                    className="self-end bg-red-500/80 hover:bg-red-600 text-white rounded-full p-1.5 transition-colors"
-                  >
-                    {deletingId === mem._id
-                      ? <span className="w-4 h-4 block border-2 border-white/50 border-t-white rounded-full animate-spin" />
-                      : <Trash2 className="w-4 h-4" />}
-                  </button>
-                  <p className="text-sm font-medium line-clamp-2">{mem.caption}</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#09090b]/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleDelete(mem._id); }}
+                      disabled={deletingId === mem._id}
+                      className="bg-black/50 backdrop-blur-md hover:bg-rose-500/80 text-white rounded-full p-2 transition-colors border border-white/10"
+                    >
+                      {deletingId === mem._id
+                        ? <span className="w-4 h-4 block border-2 border-white/50 border-t-white rounded-full animate-spin" />
+                        : <Trash2 className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <p className="text-sm font-medium text-zinc-200 line-clamp-2 drop-shadow-md tracking-wide">{mem.caption}</p>
                 </div>
               </motion.div>
             ))}
