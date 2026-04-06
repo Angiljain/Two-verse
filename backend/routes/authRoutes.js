@@ -5,6 +5,7 @@ import {
   generateInvite,
   joinPartner,
   getUserProfile,
+  getCoupleInfo,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
