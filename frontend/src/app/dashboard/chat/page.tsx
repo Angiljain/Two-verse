@@ -214,7 +214,7 @@ export default function ChatPage() {
         </div>
       )}
 
-      <form onSubmit={sendMessage} className="p-4 border-t border-white/10 bg-black/40 backdrop-blur-md flex items-center gap-2">
+      <form onSubmit={sendMessage} className="p-2 sm:p-4 border-t border-white/10 bg-black/40 backdrop-blur-md flex items-center gap-1 sm:gap-2">
         <input 
           type="file" 
           accept="image/*" 
@@ -222,20 +222,20 @@ export default function ChatPage() {
           ref={fileInputRef} 
           onChange={handleImageUpload} 
         />
-        <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2 text-white/50 hover:text-white transition-colors">
+        <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2 text-white/50 hover:text-white transition-colors shrink-0">
           <ImageIcon className="w-5 h-5" />
         </button>
-        <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2 text-white/50 hover:text-white transition-colors">
+        <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2 text-white/50 hover:text-white transition-colors shrink-0">
           <Smile className="w-5 h-5" />
         </button>
         <input 
           value={inputVal}
           onChange={handleTyping}
           placeholder="Message..."
-          className="flex-1 bg-white/5 border border-white/10 rounded-full px-4 py-3 outline-none focus:border-primary/50 transition-colors"
+          className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-full px-3 py-2 sm:px-4 sm:py-3 outline-none focus:border-primary/50 transition-colors"
         />
-        <Button type="submit" className="!rounded-full px-0 w-12 h-12 flex items-center justify-center">
-          <Send className="w-5 h-5" />
+        <Button type="submit" className="!rounded-full px-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shrink-0">
+          <Send className="w-4 h-4 sm:w-5 sm:h-5" />
         </Button>
       </form>
     </div>
