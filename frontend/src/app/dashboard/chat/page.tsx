@@ -166,7 +166,7 @@ export default function ChatPage() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto min-h-0 p-4 space-y-4 overscroll-y-contain scroll-smooth">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-white/40">
             <Heart className="w-12 h-12 text-primary/30 mb-2" />
