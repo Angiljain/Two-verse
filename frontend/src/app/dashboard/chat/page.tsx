@@ -143,7 +143,7 @@ export default function ChatPage() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden relative">
       {/* Header */}
-      <div className="p-4 pt-[max(1rem,env(safe-area-inset-top))] flex items-center justify-between z-50 sticky top-0 bg-[#09090b]/90 backdrop-blur-xl border-b border-white/[0.05]">
+      <div className="shrink-0 p-4 pt-[max(1rem,env(safe-area-inset-top))] flex items-center justify-between z-50 sticky top-0 bg-[#09090b]/90 backdrop-blur-xl border-b border-white/[0.05]">
         <div className="flex items-center gap-3">
           <button 
             type="button"
