@@ -227,7 +227,7 @@ export default function ChatPage() {
         </div>
       )}
 
-      <div className="p-4 bg-gradient-to-t from-[#09090b] via-[#09090b]/80 to-transparent sticky bottom-0">
+      <div className="p-4 bg-gradient-to-t from-[#09090b] via-[#09090b]/80 to-transparent shrink-0">
         <form onSubmit={sendMessage} className="mx-auto max-w-3xl glass-panel p-1.5 rounded-full flex items-center gap-1 shadow-2xl shadow-black/50 border-white/[0.08]">
           <input 
             type="file" 

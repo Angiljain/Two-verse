@@ -9,6 +9,7 @@ import api from '../../services/api';
 export default function Dashboard() {
   const { user } = useAuth();
   const [daysElapsed, setDaysElapsed] = useState<number | null>(null);
+  const [recentNotes, setRecentNotes] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchCoupleInfo = async () => {
@@ -24,6 +25,19 @@ export default function Dashboard() {
       }
     };
     if (user?.coupleId) fetchCoupleInfo();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchRecentNotes = async () => {
+      try {
+        const res = await api.get('/notes');
+        const sorted = res.data.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setRecentNotes(sorted.slice(0, 2));
+      } catch (err) {
+        console.error('Failed to load recent notes', err);
+      }
+    };
+    if (user) fetchRecentNotes();
   }, [user]);
 
   const actions = [
@@ -91,9 +105,31 @@ export default function Dashboard() {
            <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-500">Recent Echoes</h2>
            <Sparkles className="w-4 h-4 text-zinc-500" />
          </div>
-         <div className="glass-panel p-6 flex flex-col items-center justify-center text-center min-h-[160px] relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-            <p className="text-zinc-500 text-sm font-medium relative z-10">The timeline is quiet.<br/> Capture a moment to remember.</p>
+         <div className="flex flex-col gap-4">
+           {recentNotes.length > 0 ? (
+             recentNotes.map((note) => (
+               <div key={note._id} className="bg-[#18181b] border border-white/[0.05] p-5 rounded-[24px] relative overflow-hidden group shadow-lg">
+                 <div className="flex justify-between items-start mb-3">
+                   <h3 className="text-lg font-semibold tracking-tight text-zinc-100">{note.title}</h3>
+                   <span className="text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-white/[0.05]">
+                     {note.category}
+                   </span>
+                 </div>
+                 <p className="text-zinc-400 whitespace-pre-wrap text-sm leading-relaxed mb-4 font-medium line-clamp-2">
+                   {note.content}
+                 </p>
+                 <div className="flex justify-between items-center text-[10px] text-zinc-600 font-bold uppercase tracking-widest pt-3 border-t border-white/[0.05]">
+                   <span>{note.author?.name || 'Unknown'}</span>
+                   <span>{new Date(note.createdAt).toLocaleDateString()}</span>
+                 </div>
+               </div>
+             ))
+           ) : (
+             <div className="glass-panel p-6 flex flex-col items-center justify-center text-center min-h-[160px] relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <p className="text-zinc-500 text-sm font-medium relative z-10">The timeline is quiet.<br/> Capture a moment to remember.</p>
+             </div>
+           )}
          </div>
       </motion.div>
 
