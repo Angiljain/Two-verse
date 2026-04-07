@@ -143,13 +143,15 @@ export default function ChatPage() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden relative">
       {/* Header */}
-      <div className="p-4 flex items-center justify-between z-10 sticky top-0 bg-[#09090b]/80 backdrop-blur-xl border-b border-white/[0.02]">
+      <div className="p-4 pt-[max(1rem,env(safe-area-inset-top))] flex items-center justify-between z-50 sticky top-0 bg-[#09090b]/90 backdrop-blur-xl border-b border-white/[0.05]">
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => router.push('/dashboard')}
-            className="p-2 -ml-2 rounded-full md:hidden text-zinc-500 hover:text-white hover:bg-white/5 transition-colors"
+            type="button"
+            onClick={(e) => { e.preventDefault(); router.push('/dashboard'); }}
+            className="p-3 -ml-2 rounded-full md:hidden text-zinc-500 hover:text-white hover:bg-white/10 active:bg-white/20 transition-colors cursor-pointer"
+            aria-label="Go back to dashboard"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-7 h-7" />
           </button>
           <div className="relative">
              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center font-bold text-zinc-200 border border-white/5 shadow-inner">
