@@ -5,11 +5,11 @@ import { motion } from 'framer-motion';
 import api from '../../../services/api';
 import {
   User, Mail, Heart, Key, LogOut, Copy, Check,
-  Shield, Sparkles, Link2, Calendar, Clock
+  Shield, Sparkles, Link2, Calendar, Clock, Lock
 } from 'lucide-react';
 
 interface CoupleInfo {
-  partner: { _id: string; name: string; email: string; joinedAt: string } | null;
+  partner: { _id: string; name: string; email: string; createdAt: string } | null;
   coupleStartDate: string | null;
   coupleId: string | null;
 }
@@ -62,109 +62,148 @@ export default function ProfilePage() {
   const days = coupleInfo?.coupleStartDate ? daysSince(coupleInfo.coupleStartDate) : null;
 
   return (
-    <div className="space-y-6 pb-24 max-w-lg mx-auto pt-6 px-4">
-      {/* Editorial Header */}
-      <div className="mb-8">
-        <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] font-bold mb-1">Your Identity</p>
-        <h1 className="text-4xl font-light tracking-tight text-zinc-100">
-          The <span className="font-semibold text-gradient">TwoVerse</span> Card.
-        </h1>
+    <div className="space-y-8 pb-24 max-w-lg mx-auto pt-8 px-4">
+      {/* Header */}
+      <div className="text-center">
+        <motion.div
+           initial={{ opacity: 0, scale: 0.9 }}
+           animate={{ opacity: 1, scale: 1 }}
+           className="inline-block px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-[0.2em] mb-4"
+        >
+          TwoVerse Profile
+        </motion.div>
+        <h1 className="text-4xl font-bold tracking-tight text-white mb-2">Account Settings</h1>
+        <p className="text-zinc-500 font-medium">Manage your intimacy and shared space.</p>
       </div>
 
-      {/* Glossy ID Card */}
+      {/* User Card */}
       <motion.div
-        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-        className="relative rounded-[32px] p-8 overflow-hidden bg-[#18181b] border border-white/[0.05] shadow-2xl"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative rounded-[40px] p-8 overflow-hidden bg-white/[0.03] border border-white/[0.08] shadow-2xl backdrop-blur-3xl group"
       >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/20 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary/20 transition-colors duration-700" />
         
-        <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="relative">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center text-4xl font-bold shadow-lg shadow-primary/30 border-2 border-[#18181b]">
+        <div className="relative z-10 flex flex-col items-center">
+          <div className="w-28 h-28 rounded-full bg-gradient-to-tr from-primary to-accent p-1.5 shadow-2xl shadow-primary/20 mb-6">
+            <div className="w-full h-full rounded-full bg-[#18181b] flex items-center justify-center text-4xl font-bold text-white">
               {initials}
             </div>
           </div>
-          <h2 className="text-3xl font-light tracking-tight mt-6 text-zinc-100">{user?.name}</h2>
-          <p className="text-zinc-500 text-sm mt-1">{user?.email}</p>
+          <h2 className="text-3xl font-bold tracking-tight text-white">{user?.name}</h2>
+          <p className="text-zinc-400 font-medium mt-1.5 flex items-center gap-2">
+            <Mail className="w-4 h-4" /> {user?.email}
+          </p>
           
-          {user?.coupleId && (
-            <div className="mt-8 pt-6 border-t border-white/[0.05] w-full flex items-center justify-between">
-               <div className="text-left">
-                  <p className="text-zinc-500 uppercase tracking-[0.15em] text-[10px] font-bold">Status</p>
-                  <p className="text-primary font-medium mt-1 flex items-center gap-1.5"><Heart className="w-4 h-4 fill-primary/50" /> Paired</p>
-               </div>
-               <div className="text-right">
-                  <p className="text-zinc-500 uppercase tracking-[0.15em] text-[10px] font-bold">Days</p>
-                  <p className="text-zinc-100 font-mono font-medium mt-1 text-lg leading-none">{days !== null ? days : '--'}</p>
-               </div>
-            </div>
-          )}
+          <div className="mt-8 pt-8 border-t border-white/[0.05] w-full grid grid-cols-2 gap-4">
+             <div className="p-4 rounded-3xl bg-white/[0.02] border border-white/[0.05]">
+                <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-zinc-500 mb-1">Relationship</p>
+                <div className="flex items-center gap-2 text-primary font-bold">
+                  <Heart className="w-4 h-4 fill-primary/30" /> Paired
+                </div>
+             </div>
+             <div className="p-4 rounded-3xl bg-white/[0.02] border border-white/[0.05]">
+                <p className="text-[10px] uppercase tracking-[0.15em] font-bold text-zinc-500 mb-1">Our Journey</p>
+                <div className="flex items-center gap-2 text-white font-mono font-bold">
+                   <Sparkles className="w-4 h-4 text-accent" /> {days !== null ? `${days} Days` : '--'}
+                </div>
+             </div>
+          </div>
         </div>
       </motion.div>
 
-      {/* Partner Minimalist Card */}
+      {/* Partner Card */}
       {coupleInfo?.partner && (
         <motion.div
-          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="glass-panel rounded-3xl p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] rounded-[32px] p-6 hover:bg-white/[0.05] transition-all"
         >
-          <div className="flex items-center justify-between">
-            <p className="text-zinc-500 uppercase tracking-[0.2em] text-[10px] font-bold mb-4">Your Partner</p>
-            <Link2 className="w-4 h-4 text-zinc-600" />
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-zinc-500">Your Forever Partner</h3>
+            <Link2 className="w-5 h-5 text-zinc-600" />
           </div>
 
-          <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-xl flex-shrink-0 border border-white/[0.05] text-zinc-300">
-              {partnerInitials}
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center gap-5">
+              <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center font-bold text-2xl text-zinc-300 border border-white/5">
+                {partnerInitials}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-xl text-white">{coupleInfo.partner.name}</p>
+                <p className="text-zinc-500 font-medium text-sm truncate mt-1">{coupleInfo.partner.email}</p>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-xl leading-tight text-zinc-200">{coupleInfo.partner.name}</p>
-              <p className="text-zinc-500 text-sm truncate mt-1">{coupleInfo.partner.email}</p>
+            
+            <div className="grid grid-cols-1 gap-3">
+              <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05]">
+                <Calendar className="w-4 h-4 text-zinc-500" />
+                <p className="text-xs font-medium text-zinc-400">Joined TwoVerse on {formatDate(coupleInfo.partner.createdAt)}</p>
+              </div>
+              
+              {/* Security Policy Alert */}
+              <div className="flex items-start gap-4 px-5 py-4 rounded-2xl bg-rose-500/5 border border-rose-500/10 mt-2">
+                <Lock className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-bold text-rose-400 mb-1 uppercase tracking-wider">Privacy & Security</p>
+                  <p className="text-[11px] leading-relaxed text-zinc-400">
+                    Passwords are encrypted with <span className="text-rose-400 font-bold">256-bit hash</span>. For mutual safety, plain-text passwords cannot be displayed or recovered by anyone.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>
       )}
 
-      {/* Settings / Controls */}
+      {/* Account Actions */}
       <motion.div
-        initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-        className="glass-panel rounded-3xl overflow-hidden"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="bg-white/[0.02] border border-white/[0.05] rounded-[32px] overflow-hidden"
       >
         {user?.inviteCode && (
           <div className="flex items-center justify-between p-6 border-b border-white/[0.05]">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-white/[0.03] rounded-2xl flex items-center justify-center flex-shrink-0">
-                <Key className="w-5 h-5 text-zinc-400" />
+              <div className="w-12 h-12 bg-white/[0.05] rounded-2xl flex items-center justify-center">
+                <Key className="w-6 h-6 text-zinc-300" />
               </div>
-              <div className="flex-1">
-                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Pairing Code</p>
-                <p className="font-mono text-zinc-200 text-lg mt-0.5">{user.inviteCode}</p>
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Pairing Key</p>
+                <p className="font-mono text-white text-xl font-bold mt-1 tracking-wider">{user.inviteCode}</p>
               </div>
             </div>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={copyInviteCode}
-              className="w-10 h-10 bg-white/[0.03] hover:bg-white/[0.08] rounded-2xl flex items-center justify-center transition-colors"
+              className="w-12 h-12 bg-white/[0.05] hover:bg-primary/20 hover:text-primary rounded-2xl flex items-center justify-center transition-all"
             >
-              {copied
-                ? <Check className="w-4 h-4 text-emerald-400" />
-                : <Copy className="w-4 h-4 text-zinc-400" />}
-            </button>
+              {copied ? <Check className="w-5 h-5 text-emerald-400" /> : <Copy className="w-5 h-5" />}
+            </motion.button>
           </div>
         )}
         
-        <button
+        <motion.button
+          whileHover={{ x: 5 }}
           onClick={logout}
-          className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition-colors group"
+          className="w-full flex items-center justify-between p-7 hover:bg-rose-500/[0.05] transition-all group"
         >
            <div className="flex items-center gap-4">
-             <div className="w-10 h-10 bg-rose-500/10 rounded-2xl flex items-center justify-center group-hover:bg-rose-500/20 transition-colors">
-                <LogOut className="w-5 h-5 text-rose-500" />
+             <div className="w-12 h-12 bg-rose-500/10 rounded-2xl flex items-center justify-center group-hover:bg-rose-500/20 transition-all">
+                <LogOut className="w-6 h-6 text-rose-500" />
              </div>
-             <span className="font-medium text-zinc-300 group-hover:text-rose-400 transition-colors">Sign Out Completely</span>
+             <div className="text-left">
+                <p className="font-bold text-zinc-200 group-hover:text-rose-400 transition-colors">Sign Out</p>
+                <p className="text-xs text-zinc-500 font-medium mt-1">Safely exit your session.</p>
+             </div>
            </div>
-        </button>
+           <ChevronLeft className="w-5 h-5 text-zinc-700 rotate-180" />
+        </motion.button>
       </motion.div>
     </div>
   );
 }
+
